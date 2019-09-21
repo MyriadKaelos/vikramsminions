@@ -1,0 +1,162 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+    $(function(){
+      setInterval(function(){
+        var inTable = "";
+        $.get("/getPlayers", function(players1, status){
+          for(var i = 0; i < players1.length;i++) {
+            inTable+="<tr><td>" + players1[i].name + "<br>wins: " + players1[i].wins.length;
+            if(players1[i].judge) {inTable+="<br><strong>JUDGE</strong></td></tr>"} else {
+              inTable+="</td></tr>";
+            }
+          }
+          $('#players').html("<tr><td><strong>Players:</strong></td></tr>" + inTable);
+        });
+        $.get("/getPlay", function(play1, status){
+          if(play1.question=="") {
+            $("body").html("<form action='/home' method='POST'>" +
+                      "<input type='submit' name='submit' value='home'/>" +
+                      "</form>");
+          }
+          var judgeHand = "";
+          for(var i = 0; i < play1.played.length;i++) {
+            judgeHand += "<form action='/choseCard' method='POST' class='hand'>" +
+                      "<input style='display:none' type='textarea' name='answer'" +
+                      "readonly='true' value=\"" + play1.played[i].answer.replace("'","\'") + "\"/>" +
+                      "<input style='display:none' type='textarea' name='name'" +
+                      "readonly='true' value='" + play1.played[i].name + "'/>" +
+                      "<input style='display:none' type='textarea' name='question'" +
+                      "readonly='true' value='" + play1.question + "'/>" +
+                      "<input style='display:none' type='textarea' name='player'" +
+                      "readonly='true' value='<%=player.name%>'/>" +
+                      "<input type='submit' name = 'submit' value=\"" + play1.played[i].answer.replace("'","\'") + "\"/>" +
+                      "</form>";
+          }
+          $("#judge").html(judgeHand)
+          if($("#question").html().trim()!=play1.question) {
+            console.log("CHANGED");
+            $(".hand").css("display","none");
+            $("#nextRoundButton").css({"display":"block","bottom":"5px","background":"black","border-radius":"10px","text-align":"center","border":"3px solid white","color":"white","position":"absolute","padding":"5px"});
+            var additional="";
+            if(play1.lastWon.question.indexOf("_____")==-1) {
+              additional+="<br><strong>" + play1.lastWon.answer + "</strong>";
+            }
+            $("#trophy").html(play1.lastWon.name + " won, with the phrase,<br> " + play1.lastWon.question.replace("_____", "<strong>" + play1.lastWon.answer + "</strong>") + additional);
+          }
+        });
+      }, 1000);
+    });
+    </script>
+    <style>
+      .sideview {
+        position:static;
+        left:10px;
+        top: 10px;
+        margin: 5px;
+        display: inline-block;
+      }
+      .hand {
+        display: inline-block;
+        float:none;
+        width:123px;
+      }
+      input {
+        -webkit-appearance: none;
+      }
+      .hand input {
+        border-radius:5px;
+        background-color:black;
+        color:white;
+        width:100%;
+        display:block;
+        padding-bottom:150px;
+        text-align:left;
+        height:100px;
+        word-break:normal;
+        font-family:serif;
+        white-space:pre-wrap;font-size:15px
+      }
+      #question {
+        border-radius:0px;
+        width: 200px;
+        height: 150px;
+        vertical-align:top;
+        background-color: black;
+        color: white;
+        position: absolute;
+        padding: 5px;
+        right: 5%;
+        top: 2%;
+        font-size:15px;
+        font-family:monospace;
+      }
+      #players tr td,#players{
+        border: 1px solid black
+      }
+      #playerName {
+        border:1px solid black;
+        width:auto;
+        padding:5px;
+        background-color:black;
+        color:white;
+        border-radius: 5;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='playerName' class='sideview'><%= player.name %></div>
+      <form action='/logout' method="POST">
+        <input class='sideview' type="submit" name="submit" value="logout"/>
+        <input style='display:none' type="textarea" name="name" readonly="false" value="<%= player.name %>"/>
+      </form>
+    <form action='/restart' method="POST">
+      <input class='sideview' type="submit" name = "submit" value="restart"/>
+    </form>
+    <table id='players'>
+      <tr><td><strong>Players:</strong></td></tr>
+      <% for(var i = 0; i < users.length; i ++) { %>
+        <% if(users[i].judge) { %>
+          <tr><td><%= users[i].name %> *<strong>JUDGE</strong>*</td></tr>
+        <% } else { %>
+          <tr><td><%= users[i].name %></td></tr>
+        <% } %>
+      <% } %>
+    </table>
+    <% if(!player.judge) { %>
+      <% for(var i = 0 ; i < player.hand.length ; i++ ) {  %>
+        <form action='/playCard' method="POST" class='hand'>
+          <input style='display:none' type="textarea" name="answer" readonly="true" value='<%=player.hand[i] %>'/>
+          <input style='display:none' type="textarea" name="name" readonly="true" value='<%=player.name %>'/>
+          <input type="submit" name = "submit" value="<%=player.hand[i] %>"/>
+        </form>
+        <% } %>
+    <% } else { %>
+      <div id='judge'>
+        <% for( var i = 0 ; i < play.played.length ; i++ ) {  %>
+          <form action='/choseCard' method="POST" class='hand'>
+            <input style='display:none' type="textarea" name="answer" readonly="true" value='<%=play.played[i].answer %>'/>
+            <input style='display:none' type="textarea" name="name" readonly="true" value='<%=play.played[i].name %>'/>
+            <input style='display:none' type="textarea" name="question" readonly="true" value='<%=play.question %>'/>
+            <input style='display:none' type="textarea" name="player" readonly="true" value='<%=player.name %>'/>
+            <input type="submit" name = "submit" value="<%=play.played[i].answer %>"/>
+          </form>
+          <% } %>
+      </div>
+    <% } %>
+    <div id='question'>
+      <%= play.question %>
+    </div>
+    <div style='text-align:center'>
+      <div id='nextRoundButton' style='display:none'>
+        <form action='/nextRound' method="POST">
+          <p id='trophy'></p>
+          <input style='display:none' type='textarea' name='name' readonly='true' value='<%=player.name %>'/>
+          <input style='background-color:white' type='submit' name='submit' value='Next Round'/>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

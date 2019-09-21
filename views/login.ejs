@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+    $(function(){
+      setInterval(function(){
+        var inTable = "";
+        $.get("/getPlayers", function(players1, status){
+          for(var i = 0; i < players1.length;i++) {
+            inTable+="<tr><td>" + players1[i].name + "</td><tr>";
+          }
+          $('table').html("<tr><td><strong>Players</strong></td></tr>" + inTable);
+        });
+        $.get("/getPlay", function(play1, status){
+          if(play1.question=="") {
+            $("body").html("<form action='/home' method='POST'>" +
+                      "<input type='submit' name='submit' value='home'/>" +
+                      "</form>");
+          }
+        })
+      }, 1000);
+    });
+    </script>
+    <style>
+    #myUser {
+      font-size: 30px;
+      margin-left:20px;
+    }
+    table, tr, td {
+      border: 1px solid black;
+    }
+    .nick {
+      width:200px;
+      height:50px;
+      background-color:black;
+      color:white;
+      outline: none;
+    }
+    .sideview {
+      position:static;
+      left:10px;
+      top: 10px;
+      margin: 5px;
+      display: inline-block;
+      width:auto;
+    }
+    </style>
+  </head>
+  <body>
+    <div class='sideview'><form action='/restart' method="POST">
+      <input class='sideview' type="submit" name = "submit" value="restart"/>
+    </form><form action='/home' method="POST">
+      <input class='sideview' type="submit" name = "submit" value="home"/>
+    </form></div>
+    <% if(name != '') { %>
+      <div id='myUser'><%= name %></div>
+      <div id='main' style='text-align:center'>
+        <table align='center'>
+          <tr><td><strong>Players</strong></td></tr>
+          <% for(var i = 0; i < users.length; i ++) { %>
+            <tr><td><%= users[i].name %></td></tr>
+          <% } %>
+        </table>
+        <form action='/startGame' method="POST">
+          <input type="submit" name = "submit" value="Start Game"/>
+          <input style='display:none' type="textarea" name="name" readonly="true" value="<%= name %>"/>
+        </form>
+    <% } else { %>
+      <div id='main' style='text-align:center'>
+        <form action='/addUser' method="POST">
+          <h1>Log in</h1>
+          <input class='nick' type="textarea" name="name" placeholder="Nickname"/>
+          <input type="submit" name="submit" value="login"/>
+        </form>
+    <% } %>
+      </div>
+  </body>
+</html>

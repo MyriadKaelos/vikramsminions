@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <style>
+    input {
+      -webkit-appearance:none;
+    }
+    .sideview {
+      position:static;
+      left:10px;
+      top: 10px;
+      margin: 5px;
+      display: inline-block;
+      width:auto;
+    }
+    </style>
+  </head>
+  <body>
+    <div class='sideview'><form action='/restart' method="POST">
+      <input class='sideview' type="submit" name = "submit" value="restart"/>
+    </form></div>
+    <div class='main' style='width:auto;padding:2%'>
+      <div class='form' style='text-align:center'>
+        <h1>Cards With Cru</h1>
+        <form action='/enterLogin' method="POST">
+          <input style='background-color:black;color:white;outline:none' type="submit" name="submit" value="Start Game"/>
+        </form>
+        <form action='/addCards' method="POST">
+          <input style='background-color:black;color:white;outline:none' type="submit" name="submit" value="Add Cards"/>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
