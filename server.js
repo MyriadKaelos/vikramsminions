@@ -287,7 +287,7 @@ app.use('/', router);
 
 // START THE SERVER
 //==========================================================
-MongoClient.connect('mongodb://<dbuser>:<dbpassword>@ds019633.mlab.com:19633/vikramsminions', {useNewUrlParser:true}, (err, client) => {
+MongoClient.connect('mongodb://yateslough:Yateslough1@ds019633.mlab.com:19633/vikramsminions', {useNewUrlParser:true}, (err, client) => {
   if(err) { console.log(err) }
   console.log("Connected successfully to server");
   db = client.db('vikramsminions')
