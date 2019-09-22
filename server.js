@@ -290,7 +290,7 @@ app.use('/', router);
 MongoClient.connect('mongodb://yateslough:Yateslough1@ds019633.mlab.com:19633/vikramsminions', {useNewUrlParser:true}, (err, client) => {
   if(err) { console.log(err) }
   console.log("Connected successfully to server");
-  db = client.db('vikramsminions')
+  var db = client.db('vikramsminions')
   app.listen(process.env.PORT || 3000,function(){
     console.log("listening on 3000");
   })
